@@ -8,6 +8,11 @@ CREDENTIAL_FILE = 'SAW2710193 - Employees w Computer Science Credentials - 2017-
 CS4ALL_SCHOOLS_FILE = 'cs4all-schools.csv'
 
 def get_data():
+    '''
+    Retrives credential data (excluding employees without CS endorsements)
+
+    Returns: two DataFrames
+    '''
     employees = pd.read_excel(CREDENTIAL_FILE, sheetname = 'Computer Science')
     credentials = pd.read_excel(CREDENTIAL_FILE, sheetname = 'All')
     bool_list = []
