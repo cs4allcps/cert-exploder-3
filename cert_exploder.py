@@ -63,7 +63,7 @@ def school_counts(employees = None, credentials = None):
             teachers_at_school = teachers[teachers['SchoolId'] == schools['school_id'][row]]
             w.writerow([schools['short_name'][row], len(teachers_at_school)])
 
-def credential_lists(employees = None, credentials = None):
+def credential_lists():
     '''
     For each credential, compiles a list of employees with that credential in dataset
     '''
@@ -77,7 +77,7 @@ def credential_lists(employees = None, credentials = None):
         c = cred.replace("/", "|")
         emps_w_cred.to_csv('reports/by-credential/' + c + '.csv', index = False)
 
-def school_lists(employees = None, credentials = None):
+def school_lists():
     '''
     For each cs4all school, compiles a list of credentials/counts held by teachers in dataset
     '''
@@ -93,12 +93,29 @@ def school_lists(employees = None, credentials = None):
         with open('reports/by-school/' + school + '.csv', 'w') as f:
             w = csv.writer(f)
             w.writerow(['Credential', 'Teachers with Credential'])
-            certs = teachs_at_school['Accomplishment'].tolist()
+            certs = set(teachs_at_school['Accomplishment'].tolist())
             for cert in certs:
                 print(cert)
                 teachs_w_cert = teachs_at_school[teachs_at_school['Accomplishment'] == cert]
                 print(teachs_w_cert)
                 w.writerow([cert, len(teachs_w_cert)])
+
+def credential_counts():
+    '''
+    Compiles a list of every credential in the dataset with counts of teachers that hold them
+    '''
+    employees = pd.read_excel(CREDENTIAL_FILE, sheetname = 'Computer Science')
+    credentials = pd.read_excel(CREDENTIAL_FILE, sheetname = 'All')
+    teachers = credentials[credentials['JobTitle'] == 'Regular Teacher']
+    creds = set(teachers['Accomplishment'].tolist())
+    mkdir_p('reports')
+    with open('reports/credential-counts.csv', 'w') as f:
+        w = csv.writer(f)
+        w.writerow(['Credential', 'Teachers with Credential'])
+        for cred in creds:
+            teachs = teachers[teachers['Accomplishment'] == cred]
+            w.writerow([cred, len(teachs)])
+
 
 
 
