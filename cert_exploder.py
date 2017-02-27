@@ -65,10 +65,10 @@ def school_counts(employees = None, credentials = None):
 
 def credential_lists(employees = None, credentials = None):
     '''
-    For each credential, compiles a list of employees with that credential
+    For each credential, compiles a list of employees with that credential in dataset
     '''
-    if employees is None or credentials is None:
-        employees, credentials = get_data()
+    employees = pd.read_excel(CREDENTIAL_FILE, sheetname = 'Computer Science')
+    credentials = pd.read_excel(CREDENTIAL_FILE, sheetname = 'All')
     creds = set(credentials['Accomplishment'].tolist())
     mkdir_p('reports/by-credential')
     for cred in creds:
@@ -77,6 +77,28 @@ def credential_lists(employees = None, credentials = None):
         c = cred.replace("/", "|")
         emps_w_cred.to_csv('reports/by-credential/' + c + '.csv', index = False)
 
+def school_lists(employees = None, credentials = None):
+    '''
+    For each cs4all school, compiles a list of credentials/counts held by teachers in dataset
+    '''
+    employees = pd.read_excel(CREDENTIAL_FILE, sheetname = 'Computer Science')
+    credentials = pd.read_excel(CREDENTIAL_FILE, sheetname = 'All')
+    teachers = credentials[credentials['JobTitle'] == 'Regular Teacher']
+    schools = pd.read_csv(CS4ALL_SCHOOLS_FILE)
+    mkdir_p('reports/by-school')
+    for row in range(len(schools)):
+        school = schools['short_name'][row]
+        school_id = schools['school_id'][row]
+        teachs_at_school = teachers[teachers['SchoolId'] == school_id]
+        with open('reports/by-school/' + school + '.csv', 'w') as f:
+            w = csv.writer(f)
+            w.writerow(['Credential', 'Teachers with Credential'])
+            certs = teachs_at_school['Accomplishment'].tolist()
+            for cert in certs:
+                print(cert)
+                teachs_w_cert = teachs_at_school[teachs_at_school['Accomplishment'] == cert]
+                print(teachs_w_cert)
+                w.writerow([cert, len(teachs_w_cert)])
 
 
 
