@@ -63,6 +63,19 @@ def school_counts(employees = None, credentials = None):
             teachers_at_school = teachers[teachers['SchoolId'] == schools['school_id'][row]]
             w.writerow([schools['short_name'][row], len(teachers_at_school)])
 
+def credential_lists(employees = None, credentials = None):
+    '''
+    For each credential, compiles a list of employees with that credential
+    '''
+    if employees is None or credentials is None:
+        employees, credentials = get_data()
+    creds = set(credentials['Accomplishment'].tolist())
+    mkdir_p('reports/by-credential')
+    for cred in creds:
+        emps_w_cred = credentials[credentials['Accomplishment'] == cred]
+        del emps_w_cred['Accomplishment']
+        c = cred.replace("/", "|")
+        emps_w_cred.to_csv('reports/by-credential/' + c + '.csv', index = False)
 
 
 
